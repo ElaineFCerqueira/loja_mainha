@@ -1,0 +1,17 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    match /produtos/{arquivo} {
+      // fotos das peças são públicas (aparecem na vitrine pro mundo todo)
+      allow read: if true;
+
+      // só o admin sobe/exclui fotos — mesmo e-mail configurado no firestore.rules
+      allow write: if request.auth != null
+        && request.auth.token.email == "TROQUE_PELO_EMAIL_DA_SUA_MAE@exemplo.com"
+        && request.resource.size < 5 * 1024 * 1024   // limite de 5MB por foto
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

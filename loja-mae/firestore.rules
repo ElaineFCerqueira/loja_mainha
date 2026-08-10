@@ -1,0 +1,47 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Troque pelo e-mail da conta que sua mãe vai usar pra logar como admin
+    // (o mesmo e-mail que ela usa em /login, via Firebase Auth).
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == "TROQUE_PELO_EMAIL_DA_SUA_MAE@exemplo.com";
+    }
+
+    function estaLogado() {
+      return request.auth != null;
+    }
+
+    match /produtos/{produtoId} {
+      // vitrine é pública — qualquer visitante pode ver as peças
+      allow read: if true;
+
+      // só o admin cadastra, edita campos da peça (nome, preço, fotos, etc) ou exclui
+      allow create, delete: if isAdmin();
+
+      // update tem duas situações possíveis:
+      // 1) o admin pode editar qualquer campo (inclusive marcar vendida)
+      // 2) qualquer visitante (com conta ou não — o carrinho funciona sem
+      //    login) pode SÓ reservar uma peça disponível, exatamente a
+      //    transação feita em CartContext.jsx. Isso é seguro porque só se
+      //    pode sair de 'disponivel', então nunca "rouba" uma peça já
+      //    reservada por outra pessoa.
+      allow update: if isAdmin() || (
+        resource.data.status == 'disponivel'
+        && request.resource.data.status == 'reservado'
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'reservadoAte'])
+      );
+    }
+
+    match /pedidos/{pedidoId} {
+      // pedidos só são criados pelas Cloud Functions (que usam o Admin SDK
+      // e por isso ignoram estas regras) — aqui só liberamos leitura.
+      allow read: if estaLogado()
+        && (resource.data.usuarioId == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}
