@@ -137,7 +137,7 @@ exports.webhookMercadoPago = onRequest({ secrets: [MP_ACCESS_TOKEN] }, async (re
 
   const pedidosSnap = await db
     .collection('pedidos')
-    .where('mercadoPagoId', '==', Number(paymentId))
+    .where('mercadoPagoId', '==', String(paymentId))
     .limit(1)
     .get()
   if (pedidosSnap.empty) return res.status(200).send('ok')
