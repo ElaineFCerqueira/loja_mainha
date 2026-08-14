@@ -11,23 +11,50 @@ export default function DetalhePeca() {
   const { adicionarAoCarrinho } = useCart()
   const [peca, setPeca] = useState(null)
   const [erro, setErro] = useState(null)
+  const [erroCarrinho, setErroCarrinho] = useState(null)
 
   useEffect(() => {
+    let ativo = true
+
     getDoc(doc(db, 'produtos', id)).then((snap) => {
-      if (snap.exists()) setPeca({ id: snap.id, ...snap.data() })
+      if (!ativo) return
+      if (snap.exists()) {
+        setPeca({ id: snap.id, ...snap.data() })
+        setErro(null)
+        return
+      }
+
+      setErro('Peça não encontrada.')
     })
+
+    return () => {
+      ativo = false
+    }
   }, [id])
 
   async function handleAdicionar() {
+    setErroCarrinho(null)
     try {
       await adicionarAoCarrinho(peca)
       navigate('/carrinho')
     } catch (e) {
-      setErro(e.message)
+      setErroCarrinho(e.message)
     }
   }
 
-  if (!peca) return <p className="text-center py-20 text-tinta/40">carregando…</p>
+  if (!peca && !erro) return <p className="text-center py-20 text-tinta/40">carregando…</p>
+
+  if (erro) {
+    return (
+      <div className="max-w-md mx-auto px-6 py-24 text-center">
+        <h1 className="font-display text-3xl font-semibold text-vermelho">Peça indisponível</h1>
+        <p className="text-tinta/60 mt-3">{erro}</p>
+        <Link to="/" className="inline-block mt-6 text-sm text-terracota underline">
+          voltar para a vitrine
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -64,7 +91,7 @@ export default function DetalhePeca() {
           >
             adicionar ao carrinho
           </button>
-          {erro && <p className="text-vermelho text-sm mt-2 text-center">{erro}</p>}
+          {erroCarrinho && <p className="text-vermelho text-sm mt-2 text-center">{erroCarrinho}</p>}
           <p className="text-xs text-tinta/40 text-center mt-3">
             peça única — ao comprar, sai da vitrine
           </p>

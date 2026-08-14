@@ -30,13 +30,22 @@ export function CartProvider({ children }) {
       transaction.update(pecaRef, { status: 'reservado', reservadoAte: expiraEm })
     })
 
-    setItens((atual) => [...atual, peca])
+    setItens((atual) => {
+      if (atual.some((item) => item.id === peca.id)) return atual
+      return [...atual, peca]
+    })
   }
 
   async function removerDoCarrinho(id) {
     const pecaRef = doc(db, 'produtos', id)
     await runTransaction(db, async (transaction) => {
-      transaction.update(pecaRef, { status: 'disponivel', reservadoAte: null })
+      const snap = await transaction.get(pecaRef)
+      if (!snap.exists()) return
+
+      const dados = snap.data()
+      if (dados.status !== 'vendido') {
+        transaction.update(pecaRef, { status: 'disponivel', reservadoAte: null })
+      }
     })
     setItens((atual) => atual.filter((item) => item.id !== id))
   }

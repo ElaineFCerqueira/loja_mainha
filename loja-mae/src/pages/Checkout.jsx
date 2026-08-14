@@ -6,10 +6,12 @@ import { functions, db } from '../firebase'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 
-initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY)
+const publicKey = import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY
+if (publicKey) initMercadoPago(publicKey)
 
 export default function Checkout() {
   const { itens, total } = useCart()
+  const mpDisponivel = Boolean(publicKey)
   const { usuario } = useAuth()
   const [metodo, setMetodo] = useState('pix')
   const [nome, setNome] = useState('')
@@ -34,12 +36,18 @@ export default function Checkout() {
   async function handleGerarPix(e) {
     e.preventDefault()
     setErro(null)
+
+    if (!usuario?.email) {
+      setErro('Faça login antes de finalizar o pagamento.')
+      return
+    }
+
     setProcessando(true)
     try {
       const criarPagamentoPix = httpsCallable(functions, 'criarPagamentoPix')
       const { data } = await criarPagamentoPix({
         produtoIds,
-        pagador: { nome, cpf, email: usuario?.email },
+        pagador: { nome, cpf, email: usuario.email },
       })
       setPix(data)
     } catch (e) {
@@ -159,7 +167,13 @@ export default function Checkout() {
             <p className="text-xs text-tinta/50 mt-3">escaneie com o app do seu banco</p>
 
             <button
-              onClick={() => navigator.clipboard.writeText(pix.copiaECola)}
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(pix.copiaECola)
+                } catch {
+                  setErro('Não foi possível copiar o código Pix. Copie manualmente.')
+                }
+              }}
               className="mt-4 w-full py-3 rounded-xl border border-cru-escuro text-sm font-medium"
             >
               copiar código Pix
@@ -171,7 +185,13 @@ export default function Checkout() {
         )}
 
         {/* --- CARTÃO --- */}
-        {metodo === 'cartao' && (
+        {metodo === 'cartao' && !mpDisponivel && (
+          <div className="mt-5 rounded-xl border border-dashed border-cru-escuro bg-cru p-4 text-sm text-tinta/60">
+            Configure a variável <strong>VITE_MERCADOPAGO_PUBLIC_KEY</strong> para habilitar pagamentos com cartão.
+          </div>
+        )}
+
+        {metodo === 'cartao' && mpDisponivel && (
           <div className="mt-5">
             <CardPayment
               initialization={{ amount: total }}
