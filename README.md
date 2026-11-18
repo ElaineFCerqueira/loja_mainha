@@ -73,6 +73,14 @@ firebase init          # selecione Firestore e Storage, aponte pros arquivos .ru
 firebase deploy --only firestore:rules,storage:rules
 ```
 
+O painel administrativo em `/admin` permite cadastrar peças e mostra faturamento,
+vendas confirmadas e visualizações da vitrine e das páginas de produto. Para
+publicar a contagem de visualizações e as regras de leitura das métricas:
+```
+firebase deploy --only functions,firestore:rules
+```
+As métricas começam a ser contabilizadas após a publicação da função.
+
 ## O que falta implementar
 - [ ] Página "meus pedidos" pro cliente acompanhar status
 - [ ] Cálculo de frete (Melhor Envio ou similar)

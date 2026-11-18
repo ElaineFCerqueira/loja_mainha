@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminForm from '../components/AdminForm'
 import AdminProductList from '../components/AdminProductList'
+import AdminDashboard from '../components/AdminDashboard'
 import { useAuth } from '../context/AuthContext'
 
 const CHAVE_SESSAO = 'admin_autenticado'
@@ -64,9 +65,11 @@ export default function Admin() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="font-display text-2xl mb-6">Gerenciar peças</h1>
+    <div className="max-w-6xl mx-auto px-6 py-12">
+      <h1 className="font-display text-3xl mb-8">Painel administrativo</h1>
+      <AdminDashboard />
 
+      <h2 className="font-display text-2xl mt-12 mb-6">Gerenciar peças</h2>
       <div className="grid md:grid-cols-[1fr,1.1fr] gap-8 items-start">
         <AdminForm />
 

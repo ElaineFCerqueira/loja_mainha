@@ -88,6 +88,43 @@ exports.criarPagamentoPix = onCall({ secrets: [MP_ACCESS_TOKEN] }, async (reques
   }
 })
 
+exports.registrarVisualizacao = onCall(async (request) => {
+  const { pagina } = request.data || {}
+  if (!['vitrine', 'produto'].includes(pagina)) {
+    throw new HttpsError('invalid-argument', 'Página inválida.')
+  }
+
+  const partesData = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date())
+  const valoresData = Object.fromEntries(partesData.map(({ type, value }) => [type, value]))
+  const data = `${valoresData.year}-${valoresData.month}-${valoresData.day}`
+  const visualizacaoDiaria = db.collection('metricas_diarias').doc(data)
+  const visualizacaoTotal = db.collection('metricas').doc('visualizacoes')
+
+  await db.runTransaction(async (transacao) => {
+    transacao.set(
+      visualizacaoDiaria,
+      {
+        data,
+        visualizacoes: admin.firestore.FieldValue.increment(1),
+        paginas: { [pagina]: admin.firestore.FieldValue.increment(1) },
+      },
+      { merge: true }
+    )
+    transacao.set(
+      visualizacaoTotal,
+      { total: admin.firestore.FieldValue.increment(1) },
+      { merge: true }
+    )
+  })
+
+  return { registrado: true }
+})
+
 // Cria um pagamento com cartão a partir do token gerado pelo Card Payment
 // Brick no frontend (o número do cartão nunca passa pelo nosso backend).
 exports.criarPagamentoCartao = onCall({ secrets: [MP_ACCESS_TOKEN] }, async (request) => {
