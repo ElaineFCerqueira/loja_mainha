@@ -112,7 +112,7 @@ export default function AdminForm({ aoCadastrar }) {
             required
             type="number"
             step="0.01"
-            min="0"
+            min="0.01"
             value={campos.preco}
             onChange={(e) => atualizar('preco', e.target.value)}
             className="w-full px-3 py-2.5 border border-cru-escuro rounded-lg bg-cru text-sm"

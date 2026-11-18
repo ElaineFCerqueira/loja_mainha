@@ -7,7 +7,7 @@ export const normalizar = (p) => ({
   precoAntigo: Number(p.precoAntigo ?? p.oldPrice ?? 0) || 0,
   categoria: String(p.categoria ?? p.category ?? "").toLowerCase(),
   tags: Array.isArray(p.tags) ? p.tags : [],
-  imagem: p.imagem ?? p.imagens?.[0] ?? p.image ?? null,
+  imagem: p.imagem ?? p.fotos?.[0] ?? p.imagens?.[0] ?? p.image ?? null,
   descricao: p.descricao ?? p.description ?? "",
   criadoEm: p.criadoEm?.seconds ?? p.createdAt?.seconds ?? Number(p.criadoEm) ?? 0,
   cor: p.cor ?? null,

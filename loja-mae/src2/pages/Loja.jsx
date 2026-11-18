@@ -7,8 +7,9 @@ import { Icon } from "../components/ui.jsx";
 import Home from "../components/Home.jsx";
 import CartDrawer from "../components/CartDrawer.jsx";
 import Obrigado from "../components/Obrigado.jsx";
+import Checkout from "../components/Checkout.jsx";
 
-/* Rotas por hash (#/, #/checkout, #/obrigado): funciona sem react-router. */
+/* Rotas por hash (#/, #/obrigado): funciona sem react-router. */
 function useRota() {
   const ler = () => window.location.hash.replace(/^#/, "") || "/";
   const [rota, setRota] = useState(ler);
@@ -163,8 +164,17 @@ function Aviso() {
   );
 }
 
-function Casca({ pecas, carregando, onFinalizar }) {
+function Casca({ pecas, carregando, onFinalizar, abrirCarrinho = false, rotaInicial = null }) {
   const [rota, irPara] = useRota();
+  const { setCarrinhoAberto } = useLoja();
+
+  useEffect(() => {
+    if (rotaInicial) irPara(rotaInicial);
+  }, [rotaInicial, irPara]);
+
+  useEffect(() => {
+    if (abrirCarrinho) setCarrinhoAberto(true);
+  }, [abrirCarrinho, setCarrinhoAberto]);
 
   const rolarPara = useCallback(
     (id) => {
@@ -183,7 +193,9 @@ function Casca({ pecas, carregando, onFinalizar }) {
     <div className="fr-root fr-textura">
       <Header rota={rota} irPara={irPara} rolarPara={rolarPara} />
       <main>
-        {rota === "/obrigado" ? (
+        {rota === "/checkout" ? (
+          <Checkout irPara={irPara} onFinalizar={onFinalizar} />
+        ) : rota === "/obrigado" ? (
           <Obrigado irPara={irPara} />
         ) : (
           <Home pecas={pecas} carregando={carregando} rolarPara={rolarPara} />
@@ -204,14 +216,14 @@ function Casca({ pecas, carregando, onFinalizar }) {
  *                         { numero, pix?: { copiaECola, qrCodeBase64 } }.
  *                         Se lançar erro, a mensagem aparece para a cliente.
  */
-export default function Loja({ produtos, carregando = false, onFinalizar }) {
+export default function Loja({ produtos, carregando = false, onFinalizar, abrirCarrinho = false, rotaInicial = null }) {
   const pecas = useMemo(
     () => (produtos ? produtos.map(normalizar) : PRODUTOS_DEMO.map(normalizar)),
     [produtos]
   );
   return (
     <LojaProvider todasAsPecas={produtos && !carregando ? pecas : null}>
-      <Casca pecas={pecas} carregando={carregando} onFinalizar={onFinalizar} />
+      <Casca pecas={pecas} carregando={carregando} onFinalizar={onFinalizar} abrirCarrinho={abrirCarrinho} rotaInicial={rotaInicial} />
     </LojaProvider>
   );
 }

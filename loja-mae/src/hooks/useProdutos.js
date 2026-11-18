@@ -5,6 +5,7 @@ import { db } from '../firebase'
 export function useProdutos(categoria) {
   const [produtos, setProdutos] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [erro, setErro] = useState(null)
 
   useEffect(() => {
     const base = collection(db, 'produtos')
@@ -16,10 +17,15 @@ export function useProdutos(categoria) {
     const unsubscribe = onSnapshot(q, (snap) => {
       setProdutos(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
       setCarregando(false)
+      setErro(null)
+    }, () => {
+      setProdutos([])
+      setCarregando(false)
+      setErro('Não foi possível carregar as peças.')
     })
 
     return unsubscribe
   }, [categoria])
 
-  return { produtos, carregando }
+  return { produtos, carregando, erro }
 }

@@ -10,6 +10,7 @@ export default function Admin() {
   const { usuario, carregando } = useAuth()
   const [autenticado, setAutenticado] = useState(false)
   const [senha, setSenha] = useState('')
+  const [erro, setErro] = useState(null)
 
   useEffect(() => {
     setAutenticado(sessionStorage.getItem(CHAVE_SESSAO) === 'true')
@@ -17,10 +18,16 @@ export default function Admin() {
 
   function handleEntrar(e) {
     e.preventDefault()
-    if (senha === import.meta.env.VITE_ADMIN_PASSWORD) {
+    const senhaConfigurada = import.meta.env.VITE_ADMIN_PASSWORD
+    if (senhaConfigurada && senha === senhaConfigurada) {
       sessionStorage.setItem(CHAVE_SESSAO, 'true')
       setAutenticado(true)
+      setErro(null)
+      return
     }
+    setErro(senhaConfigurada
+      ? 'Senha incorreta.'
+      : 'Senha administrativa não configurada.')
   }
 
   if (carregando) return null
@@ -56,6 +63,7 @@ export default function Admin() {
           onChange={(e) => setSenha(e.target.value)}
           className="w-full px-3 py-2.5 border border-cru-escuro rounded-lg bg-cru text-sm"
         />
+        {erro && <p className="text-vermelho text-sm">{erro}</p>}
         <button className="w-full py-3 rounded-xl bg-terracota text-white font-semibold text-sm">
           entrar
         </button>

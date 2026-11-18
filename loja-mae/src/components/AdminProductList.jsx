@@ -10,12 +10,14 @@ const STATUS_LABEL = {
 
 export default function AdminProductList() {
   const [produtos, setProdutos] = useState([])
+  const [erro, setErro] = useState(null)
 
   useEffect(() => {
     const q = query(collection(db, 'produtos'), orderBy('dataCriacao', 'desc'))
     return onSnapshot(q, (snap) => {
       setProdutos(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-    })
+      setErro(null)
+    }, () => setErro('Não foi possível carregar as peças cadastradas.'))
   }, [])
 
   async function alternarStatus(peca) {
@@ -29,6 +31,7 @@ export default function AdminProductList() {
   }
 
   if (produtos.length === 0) {
+    if (erro) return <p className="text-vermelho text-sm">{erro}</p>
     return <p className="text-tinta/40 text-sm">nenhuma peça cadastrada ainda</p>
   }
 

@@ -16,16 +16,20 @@ export default function DetalhePeca() {
   useEffect(() => {
     let ativo = true
 
-    getDoc(doc(db, 'produtos', id)).then((snap) => {
-      if (!ativo) return
-      if (snap.exists()) {
-        setPeca({ id: snap.id, ...snap.data() })
-        setErro(null)
-        return
-      }
+    getDoc(doc(db, 'produtos', id))
+      .then((snap) => {
+        if (!ativo) return
+        if (snap.exists()) {
+          setPeca({ id: snap.id, ...snap.data() })
+          setErro(null)
+          return
+        }
 
-      setErro('Peça não encontrada.')
-    })
+        setErro('Peça não encontrada.')
+      })
+      .catch(() => {
+        if (ativo) setErro('Não foi possível carregar esta peça.')
+      })
 
     return () => {
       ativo = false
@@ -65,9 +69,17 @@ export default function DetalhePeca() {
           className="aspect-[4/5] rounded-2xl p-2.5"
           style={{ background: 'conic-gradient(#1B4D8C 0deg 340deg, transparent 340deg 360deg)' }}
         >
-          <div className="w-full h-full rounded-xl bg-cru-escuro flex items-center justify-center text-tinta/30 font-display">
-            foto principal
-          </div>
+          {peca.fotos?.[0] ? (
+            <img
+              src={peca.fotos[0]}
+              alt={peca.nome}
+              className="w-full h-full rounded-xl object-cover"
+            />
+          ) : (
+            <div className="w-full h-full rounded-xl bg-cru-escuro flex items-center justify-center text-tinta/30 font-display">
+              foto principal
+            </div>
+          )}
         </div>
 
         <div>

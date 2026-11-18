@@ -10,7 +10,7 @@ const CATEGORIAS = [
 
 export default function Vitrine() {
   const [categoria, setCategoria] = useState('todas')
-  const { produtos, carregando } = useProdutos(categoria)
+  const { produtos, carregando, erro } = useProdutos(categoria)
 
   return (
     <div>
@@ -36,7 +36,8 @@ export default function Vitrine() {
 
       <main className="max-w-5xl mx-auto px-6 pb-20 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-7 gap-y-9">
         {carregando && <p className="col-span-full text-center text-tinta/40">carregando peças…</p>}
-        {!carregando && produtos.length === 0 && (
+        {!carregando && erro && <p className="col-span-full text-center text-vermelho">{erro}</p>}
+        {!carregando && !erro && produtos.length === 0 && (
           <p className="col-span-full text-center text-tinta/40">nenhuma peça disponível nessa categoria agora</p>
         )}
         {produtos.map((produto) => (
