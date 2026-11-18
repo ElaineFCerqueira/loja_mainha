@@ -1,0 +1,62 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap");
+
+.fr-root {
+  font-family: "Work Sans", system-ui, sans-serif;
+  color: #2a1d10;
+  background: #fdf3e4;
+  min-height: 100vh;
+}
+.fr-titulo {
+  font-family: "Fraunces", Georgia, serif;
+}
+/* fitinha do Bonfim: ponta em V embaixo */
+.fr-fita {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+}
+/* rabo de andorinha na ponta direita */
+.fr-rabo {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 50%, 100% 100%, 0 100%);
+}
+.fr-textura {
+  background-image: radial-gradient(rgba(42, 29, 16, 0.05) 1px, transparent 1px);
+  background-size: 14px 14px;
+}
+
+@keyframes fr-balanca {
+  0%, 100% { transform: rotate(var(--r)) translateY(0); }
+  50% { transform: rotate(calc(var(--r) + 2deg)) translateY(-8px); }
+}
+.fr-balanca {
+  animation: fr-balanca 6s ease-in-out infinite;
+}
+@keyframes fr-flutua {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.fr-flutua {
+  animation: fr-flutua 5s ease-in-out infinite;
+}
+@keyframes fr-cai {
+  0% { transform: translateY(-12vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(112vh) rotate(540deg); opacity: 0.9; }
+}
+@keyframes fr-entra {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+@keyframes fr-sobe {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fr-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.fr-entra { animation: fr-entra 0.3s ease-out; }
+.fr-sobe { animation: fr-sobe 0.5s ease-out both; }
+.fr-pop { animation: fr-pop 0.5s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fr-balanca, .fr-flutua, .fr-entra, .fr-sobe, .fr-pop { animation: none !important; }
+}
