@@ -15,7 +15,7 @@ export default function Vitrine() {
   return (
     <div>
       <header className="text-center pt-12 pb-8">
-        <h1 className="font-display text-4xl font-semibold">Fitas & Retalhos</h1>
+        <h1 className="font-display text-4xl font-semibold">Lene Artes</h1>
         <p className="text-sm text-tinta/50 mt-2">peças únicas, feitas à mão em Salvador</p>
       </header>
 

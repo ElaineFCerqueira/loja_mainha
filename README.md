@@ -1,4 +1,4 @@
-# Fitas & Retalhos
+# Lene Artes
 
 Loja virtual de peças únicas (roupas e artesanato), feitas à mão.
 

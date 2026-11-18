@@ -61,7 +61,7 @@ exports.criarPagamentoPix = onCall({ secrets: [MP_ACCESS_TOKEN] }, async (reques
     body: {
       transaction_amount: total,
       payment_method_id: 'pix',
-      description: 'Fitas & Retalhos',
+      description: 'Lene Artes',
       payer: {
         email: pagador.email,
         first_name: pagador.nome,
